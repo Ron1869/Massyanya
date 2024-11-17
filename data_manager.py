@@ -1,7 +1,7 @@
 # data_manager.py
 # Ron Company #
 
-import os  
+import os
 from exchange_manager import ExchangeManager
 import pandas as pd
 import time
@@ -90,7 +90,7 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
 
-def validate_short_term_prediction(entry_price, target_price, min_distance=2000):
+def validate_short_term_prediction(entry_price, target_price, min_distance=10000):
     """
     Проверить, что предсказание для краткосрочной сделки соответствует минимальному количеству пунктов.
     Если расстояние меньше минимального, сделка пропускается.
@@ -100,7 +100,7 @@ def validate_short_term_prediction(entry_price, target_price, min_distance=2000)
         return False
     return True
 
-def validate_long_term_prediction(entry_price, target_price, min_distance=8000):
+def validate_long_term_prediction(entry_price, target_price, min_distance=80000):
     """
     Проверить, что предсказание для долгосрочной сделки соответствует минимальному количеству пунктов.
     Если расстояние меньше минимального, сделка пропускается.
