@@ -1,7 +1,7 @@
 # data_manager.py
 # Ron Company #
 
-import os  # Необходимый импорт для работы с переменными окружения
+import os  
 from exchange_manager import ExchangeManager
 import pandas as pd
 import time
@@ -90,32 +90,25 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
 
-def calculate_take_profit_and_stop_loss(entry_price, min_distance=800):
+def validate_short_term_prediction(entry_price, target_price, min_distance=2000):
     """
-    Рассчитать уровни тейк-профита и стоп-лосса с минимальным расстоянием.
+    Проверить, что предсказание для краткосрочной сделки соответствует минимальному количеству пунктов.
+    Если расстояние меньше минимального, сделка пропускается.
     """
-    take_profit = entry_price + min_distance
-    stop_loss = entry_price - min_distance
-    return take_profit, stop_loss
+    if abs(target_price - entry_price) < min_distance:
+        print(f"Пропуск краткосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
+        return False
+    return True
 
-def place_order_with_take_profit_and_stop_loss(exchange, symbol, side, amount, entry_price):
+def validate_long_term_prediction(entry_price, target_price, min_distance=8000):
     """
-    Разместить ордер с тейк-профитом и стоп-лоссом, учитывая минимальное расстояние.
+    Проверить, что предсказание для долгосрочной сделки соответствует минимальному количеству пунктов.
+    Если расстояние меньше минимального, сделка пропускается.
     """
-    take_profit, stop_loss = calculate_take_profit_and_stop_loss(entry_price)
-    min_distance = 800  # Минимальное расстояние в пунктах
-
-    # Проверяем, что тейк-профит и стоп-лосс находятся на безопасном расстоянии
-    if abs(take_profit - entry_price) < min_distance or abs(entry_price - stop_loss) < min_distance:
-        print(f"Пропуск установки тейк-профита и стоп-лосса: минимальное расстояние {min_distance} пунктов не достигнуто.")
-        return
-
-    try:
-        # Размещение тейк-профита и стоп-лосса
-        print(f"Установка стоп-лосса на {stop_loss} и тейк-профита на {take_profit}")
-        # Логика для размещения тейк-профита и стоп-лосса через API биржи
-    except Exception as e:
-        print(f"Ошибка при размещении тейк-профита и стоп-лосса: {e}")
+    if abs(target_price - entry_price) < min_distance:
+        print(f"Пропуск долгосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
+        return False
+    return True
 
 def wait_for_next_candle(interval_seconds):
     """Функция ожидания следующей свечи, чтобы минимизировать дублирование данных."""
