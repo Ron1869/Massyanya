@@ -38,7 +38,6 @@ def fetch_balance():
         balance_info = exchange.fetch_balance()
         print(f"Информация о балансе: {balance_info}")
         balance = balance_info['total'].get('USDT', 0)
-        print(f"Баланс, полученный с биржи: {balance} USDT")
         return balance
     except Exception as e:
         print(f"Ошибка при получении баланса: {e}")
@@ -54,10 +53,6 @@ def fetch_current_price(symbol):
     try:
         ticker = exchange.fetch_ticker(symbol)
         current_price = ticker.get('last')
-        if current_price is not None:
-            print(f"Текущая цена для {symbol}: {current_price}")
-        else:
-            print(f"Ошибка: Не удалось получить цену для {symbol}.")
         return current_price
     except Exception as e:
         print(f"Ошибка при получении текущей цены для {symbol}: {e}")
@@ -73,10 +68,6 @@ def fetch_current_volume(symbol):
     try:
         ticker = exchange.fetch_ticker(symbol)
         current_volume = ticker.get('quoteVolume')
-        if current_volume is not None:
-            print(f"Текущий объем для {symbol}: {current_volume}")
-        else:
-            print(f"Ошибка: Не удалось получить объем для {symbol}.")
         return current_volume
     except Exception as e:
         print(f"Ошибка при получении текущего объема для {symbol}: {e}")
@@ -98,6 +89,14 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
     except Exception as e:
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
+
+def calculate_take_profit_and_stop_loss(entry_price, min_distance=800):
+    """
+    Рассчитать уровни тейк-профита и стоп-лосса с минимальным расстоянием.
+    """
+    take_profit = entry_price + min_distance
+    stop_loss = entry_price - min_distance
+    return take_profit, stop_loss
 
 def wait_for_next_candle(interval_seconds):
     """Функция ожидания следующей свечи, чтобы минимизировать дублирование данных."""
