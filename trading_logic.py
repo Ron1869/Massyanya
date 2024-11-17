@@ -119,6 +119,15 @@ class TradingBot:
             # Получение текущей цены для расчета объема сделки
             current_price = fetch_current_price(symbol)
 
+            # Преобразуем текущую цену в целое число, чтобы исключить дробную часть
+            entry_price_int = int(current_price)
+
+            # Определение целевой цены в зависимости от типа сделки
+            if take_profit_percent >= 80000:
+                target_price = entry_price_int + 8000  # Долгосрочная сделка: добавляем 8000 пунктов
+            else:
+                target_price = entry_price_int + 2000  # Краткосрочная сделка: добавляем 2000 пунктов
+
             entry_amount_usdt = max(entry_amount_usdt, 110)
             amount = entry_amount_usdt / current_price
             print(f"Рассчитанный объем сделки: {amount}")
@@ -142,12 +151,6 @@ class TradingBot:
             order = self.exchange.create_market_order(symbol, side, amount)
             print(f"Ордер на {side} размещен: {order}")
             self.active_trade = True
-
-            # Получение целевой цены для долгосрочных или краткосрочных сделок
-            if take_profit_percent >= 80000:
-                target_price = validate_long_term_prediction(current_price)
-            else:
-                target_price = validate_short_term_prediction(current_price)
 
             # Установка стоп-лосса и тейк-профита
             stop_loss_price = current_price * (1 - stop_loss_percent / 100) if side == 'buy' else current_price * (
@@ -220,15 +223,3 @@ class TradingBot:
 
             time.sleep(5)
 
-    def stop_bot(self):
-        """Останавливает выполнение бота."""
-        self.bot_running = False
-
-    def fetch_order_history(self, symbol):
-        """Получение истории ордеров для указанного символа."""
-        try:
-            orders = self.exchange.fetch_orders(symbol)
-            return orders
-        except Exception as e:
-            print(f"Ошибка при получении истории ордеров: {e}")
-            return []
