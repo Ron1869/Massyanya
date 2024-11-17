@@ -90,13 +90,15 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
 
-def calculate_take_profit_and_stop_loss(entry_price, min_distance=800):
+def validate_prediction(entry_price, target_price, min_distance=800):
     """
-    Рассчитать уровни тейк-профита и стоп-лосса с минимальным расстоянием.
+    Проверить, что предсказание соответствует минимальному количеству пунктов.
+    Если расстояние меньше минимального, сделка пропускается.
     """
-    take_profit = entry_price + min_distance
-    stop_loss = entry_price - min_distance
-    return take_profit, stop_loss
+    if abs(target_price - entry_price) < min_distance:
+        print(f"Пропуск сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
+        return False
+    return True
 
 def wait_for_next_candle(interval_seconds):
     """Функция ожидания следующей свечи, чтобы минимизировать дублирование данных."""
