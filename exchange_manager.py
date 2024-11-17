@@ -70,12 +70,20 @@ class ExchangeManager:
         """Получает текущие комиссии на торговлю с биржи."""
         if self.exchange:
             try:
-                fees = self.exchange.fapiPrivate_get_account()['makerCommission'] / 10000
-                self.maker_commission = fees
-                self.taker_commission = fees
-                # Убрал вывод обновленных комиссий
+                markets = self.exchange.load_markets()
+                # Здесь берутся комиссии с рынка BTC/USDT в качестве примера
+                if 'BTC/USDT' in markets:
+                    market = markets['BTC/USDT']
+                    maker_fee = market['maker']
+                    taker_fee = market['taker']
+                    self.maker_commission = maker_fee
+                    self.taker_commission = taker_fee
+                    return max(maker_fee, taker_fee)
+                else:
+                    print("Ошибка: Не удалось найти рынок BTC/USDT для получения комиссий.")
             except Exception as e:
                 print(f"Ошибка при получении комиссий: {e}")
+        return None
 
 # Создаем глобальный экземпляр менеджера биржи
 exchange_manager = ExchangeManager()
@@ -94,4 +102,4 @@ def cancel_all_orders(symbol):
     exchange_manager.cancel_all_orders(symbol)
 
 def get_trading_fees():
-    exchange_manager.get_trading_fees()
+    return exchange_manager.get_trading_fees()
