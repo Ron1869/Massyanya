@@ -98,12 +98,12 @@ def validate_short_term_prediction(entry_price, min_distance=2000):
     target_price = entry_price + min_distance  # Используем целые числа и добавляем минимальное количество пунктов для краткосрочных сделок
     return target_price
 
-def validate_long_term_prediction(entry_price, min_distance=8000):
+def validate_long_term_prediction(entry_price, min_distance=80000):
     """
     Проверить и скорректировать предсказание для долгосрочной сделки, чтобы оно соответствовало минимальному количеству пунктов (целых).
     """
     entry_price = int(entry_price)
-    target_price = entry_price + min_distance  # Используем целые числа и добавляем минимальное количество пунктов для долгосрочных сделок
+    target_price = entry_price + min_distance  # Используем целые числа и добавляем значительное количество пунктов для долгосрочных сделок
     return target_price
 
 def place_take_profit(predicted_price):
