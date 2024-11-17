@@ -129,35 +129,14 @@ class TradingBot:
                     "Даже после увеличения сумма или объем не соответствуют минимальным требованиям. Ордер не будет размещен.")
                 return None
 
-            # Используем данные с Binance
-            df = self.fetch_binance_data(symbol)
-            if df is None or df.empty:
-                print("Ошибка: Не удалось получить данные для символа, пропуск размещения ордера.")
+            # Проверка минимального объема сделки для биржи
+            market_info = self.exchange.market(symbol)
+            if amount < market_info['limits']['amount']['min']:
+                print(f"Ошибка: Рассчитанный объем сделки {amount} меньше минимально допустимого {market_info['limits']['amount']['min']} для {symbol}.")
                 return None
 
-            df = self.calculate_indicators(df)  # Рассчитываем MACD и RSI
-            if df is None:
-                return None
-
-            # Проверяем направление и индикаторы
-            last_row = df.iloc[-1]
-            if last_row['macd'] > last_row['macd_signal'] and last_row['rsi'] < 70:
-                print("Условия для покупки выполнены.")
-            elif last_row['macd'] < last_row['macd_signal'] and last_row['rsi'] > 30:
-                print("Условия для продажи выполнены.")
-            else:
-                print("Нет подходящих условий для открытия сделки.")
-                return None
-
-            # Рассчитать потенциальную прибыль
-            take_profit_price = current_price * (1 + take_profit_percent / 100) if side == 'buy' else current_price * (
-                    1 - take_profit_percent / 100)
-            potential_profit = self.calculate_potential_profit(current_price, take_profit_price, side)
-
-            if potential_profit < 0:
-                print(
-                    f"Потенциальная прибыль отрицательна: {potential_profit:.2f}% (учитывая комиссию). Сделка не будет открыта.")
-                return None
+            # Логирование перед размещением ордера
+            print(f"Параметры ордера: Сторона - {side}, Объем - {amount}, Текущая цена - {current_price}")
 
             # Размещение рыночного ордера
             order = self.exchange.create_market_order(symbol, side, amount)
@@ -169,6 +148,10 @@ class TradingBot:
                     1 + stop_loss_percent / 100)
             take_profit_price = current_price * (1 + take_profit_percent / 100) if side == 'buy' else current_price * (
                     1 - take_profit_percent / 100)
+
+            # Логирование перед установкой стоп-лосса и тейк-профита
+            print(f"Установка стоп-лосса на {stop_loss_price} и тейк-профита на {take_profit_price}")
+
             self.exchange.create_order(symbol, 'STOP_MARKET', 'sell' if side == 'buy' else 'buy', amount, None,
                                        {'stopPrice': stop_loss_price})
             self.exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', 'sell' if side == 'buy' else 'buy', amount, None,
@@ -213,7 +196,7 @@ class TradingBot:
             predicted_close_short = predict_next_close(models, df, window_size=10)
             predicted_close_long = predict_next_close(models, df, window_size=60)
             current_price = fetch_current_price(symbol)
-            
+
             # Проверка потенциальной прибыли для краткосрочной сделки
             potential_profit_short = self.calculate_potential_profit(current_price, predicted_close_short, 'buy')
             if potential_profit_short > 0:
@@ -235,3 +218,12 @@ class TradingBot:
     def stop_bot(self):
         """Останавливает выполнение бота."""
         self.bot_running = False
+
+    def fetch_order_history(self, symbol):
+        """Получение истории ордеров для указанного символа."""
+        try:
+            orders = self.exchange.fetch_orders(symbol)
+            return orders
+        except Exception as e:
+            print(f"Ошибка при получении истории ордеров: {e}")
+            return []
