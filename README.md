@@ -1,4 +1,3 @@
-# Massyanya
 # Massyanya: Automated Cryptocurrency Trading Bot
 
 **Massyanya** is an automated cryptocurrency trading bot designed for trading on the Binance exchange. The bot utilizes machine learning models and various trading strategies to identify profitable trading opportunities in the highly volatile cryptocurrency market. Massyanya aims to make informed trading decisions by analyzing historical data, calculating technical indicators, and predicting future price movements.
