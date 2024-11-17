@@ -144,10 +144,10 @@ class TradingBot:
             self.active_trade = True
 
             # Получение целевой цены для долгосрочных или краткосрочных сделок
-            if side == 'buy':
-                target_price = validate_long_term_prediction(current_price) if take_profit_percent >= 80000 else validate_short_term_prediction(current_price)
+            if take_profit_percent >= 80000:
+                target_price = validate_long_term_prediction(current_price)
             else:
-                target_price = validate_long_term_prediction(current_price) if take_profit_percent >= 80000 else validate_short_term_prediction(current_price)
+                target_price = validate_short_term_prediction(current_price)
 
             # Установка стоп-лосса и тейк-профита
             stop_loss_price = current_price * (1 - stop_loss_percent / 100) if side == 'buy' else current_price * (
