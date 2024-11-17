@@ -90,29 +90,21 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
 
-def validate_short_term_prediction(entry_price, target_price, min_distance=2000):
+def validate_short_term_prediction(entry_price, min_distance=2000):
     """
-    Проверить, что предсказание для краткосрочной сделки соответствует минимальному количеству пунктов (целых).
-    Если расстояние меньше минимального, сделка пропускается.
+    Проверить и скорректировать предсказание для краткосрочной сделки, чтобы оно соответствовало минимальному количеству пунктов (целых).
     """
     entry_price = int(entry_price)
-    target_price = int(target_price)
-    if abs(target_price - entry_price) < min_distance:
-        print(f"Пропуск краткосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
-        return False
-    return True
+    target_price = entry_price + min_distance  # Используем целые числа и добавляем минимальное количество пунктов для краткосрочных сделок
+    return target_price
 
-def validate_long_term_prediction(entry_price, target_price, min_distance=8000):
+def validate_long_term_prediction(entry_price, min_distance=8000):
     """
-    Проверить, что предсказание для долгосрочной сделки соответствует минимальному количеству пунктов (целых).
-    Если расстояние меньше минимального, сделка пропускается.
+    Проверить и скорректировать предсказание для долгосрочной сделки, чтобы оно соответствовало минимальному количеству пунктов (целых).
     """
     entry_price = int(entry_price)
-    target_price = int(target_price)
-    if abs(target_price - entry_price) < min_distance:
-        print(f"Пропуск долгосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
-        return False
-    return True
+    target_price = entry_price + min_distance  # Используем целые числа и добавляем минимальное количество пунктов для долгосрочных сделок
+    return target_price
 
 def place_take_profit(predicted_price):
     """
