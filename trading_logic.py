@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import talib
 from ta.trend import MACD
-from exchange_manager import exchange_manager
+from exchange_manager import exchange_manager, get_trading_fees
 from data_manager import fetch_balance, fetch_current_price, fetch_current_volume
 import ccxt
 from neural_network import train_models, predict_next_close
@@ -79,8 +79,12 @@ class TradingBot:
 
         return df
 
-    def calculate_potential_profit(self, entry_price, target_price, side, commission_rate=0.0005):
+    def calculate_potential_profit(self, entry_price, target_price, side, commission_rate=None):
         """Рассчитывает потенциальную прибыль с учетом комиссии."""
+        # Получаем комиссии, если они не были переданы
+        if commission_rate is None:
+            commission_rate = get_trading_fees()  # Получение актуальной комиссии
+
         # Рассчитать разницу между ценой входа и целью
         if side == 'buy':
             price_diff = target_price - entry_price
@@ -144,7 +148,7 @@ class TradingBot:
 
             # Рассчитать потенциальную прибыль
             take_profit_price = current_price * (1 + take_profit_percent / 100) if side == 'buy' else current_price * (
-                        1 - take_profit_percent / 100)
+                    1 - take_profit_percent / 100)
             potential_profit = self.calculate_potential_profit(current_price, take_profit_price, side)
 
             if potential_profit < 0:
@@ -159,9 +163,9 @@ class TradingBot:
 
             # Установка стоп-лосса и тейк-профита
             stop_loss_price = current_price * (1 - stop_loss_percent / 100) if side == 'buy' else current_price * (
-                        1 + stop_loss_percent / 100)
+                    1 + stop_loss_percent / 100)
             take_profit_price = current_price * (1 + take_profit_percent / 100) if side == 'buy' else current_price * (
-                        1 - take_profit_percent / 100)
+                    1 - take_profit_percent / 100)
             self.exchange.create_order(symbol, 'STOP_MARKET', 'sell' if side == 'buy' else 'buy', amount, None,
                                        {'stopPrice': stop_loss_price})
             self.exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', 'sell' if side == 'buy' else 'buy', amount, None,
@@ -170,7 +174,6 @@ class TradingBot:
         except Exception as e:
             print(f"Ошибка при размещении ордера: {e}")
             return None
-
 
     def run_bot(self, symbol, entry_percentage, stop_loss_percent, take_profit_percent, leverage, buffer_percent, auto_sl_tp,
                 enable_break_even, timeframe, volume_threshold):
