@@ -1,7 +1,7 @@
 # data_manager.py
 # Ron Company #
 
-import os
+import os  # Необходимый импорт для работы с переменными окружения
 from exchange_manager import ExchangeManager
 import pandas as pd
 import time
@@ -90,13 +90,13 @@ def fetch_historical_data(symbol, timeframe='1d', limit=100):
         print(f"Ошибка при получении исторических данных для {symbol}: {e}")
         return pd.DataFrame()
 
-def validate_short_term_prediction(entry_price, target_price, min_distance=10000):
+def validate_short_term_prediction(entry_price, target_price, min_distance=20000):
     """
     Проверить, что предсказание для краткосрочной сделки соответствует минимальному количеству пунктов.
     Если расстояние меньше минимального, сделка пропускается.
     """
-    if abs(target_price - entry_price) < min_distance:
-        print(f"Пропуск краткосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
+    if abs(target_price - entry_price) < min_distance / 10.0:
+        print(f"Пропуск краткосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance / 10.0} пунктов.")
         return False
     return True
 
@@ -105,10 +105,18 @@ def validate_long_term_prediction(entry_price, target_price, min_distance=80000)
     Проверить, что предсказание для долгосрочной сделки соответствует минимальному количеству пунктов.
     Если расстояние меньше минимального, сделка пропускается.
     """
-    if abs(target_price - entry_price) < min_distance:
-        print(f"Пропуск долгосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance} пунктов.")
+    if abs(target_price - entry_price) < min_distance / 10.0:
+        print(f"Пропуск долгосрочной сделки: расстояние между текущей ценой и целевой ценой меньше {min_distance / 10.0} пунктов.")
         return False
     return True
+
+def place_take_profit(entry_price, predicted_price):
+    """
+    Устанавливает тейк-профит на предсказанную цену.
+    """
+    take_profit = predicted_price
+    print(f"Установка тейк-профита на {take_profit}")
+    # Здесь добавить логику для размещения ордера на бирже
 
 def wait_for_next_candle(interval_seconds):
     """Функция ожидания следующей свечи, чтобы минимизировать дублирование данных."""
