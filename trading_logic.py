@@ -7,7 +7,7 @@ import pandas as pd
 import talib
 from ta.trend import MACD
 from exchange_manager import exchange_manager, get_trading_fees
-from data_manager import fetch_balance, fetch_current_price, fetch_current_volume
+from data_manager import fetch_balance, fetch_current_price, fetch_current_volume, validate_short_term_prediction, validate_long_term_prediction
 import ccxt
 from neural_network import train_models, predict_next_close
 from sklearn.cluster import KMeans
@@ -143,11 +143,16 @@ class TradingBot:
             print(f"Ордер на {side} размещен: {order}")
             self.active_trade = True
 
+            # Получение целевой цены для долгосрочных или краткосрочных сделок
+            if side == 'buy':
+                target_price = validate_long_term_prediction(current_price) if take_profit_percent >= 80000 else validate_short_term_prediction(current_price)
+            else:
+                target_price = validate_long_term_prediction(current_price) if take_profit_percent >= 80000 else validate_short_term_prediction(current_price)
+
             # Установка стоп-лосса и тейк-профита
             stop_loss_price = current_price * (1 - stop_loss_percent / 100) if side == 'buy' else current_price * (
                     1 + stop_loss_percent / 100)
-            take_profit_price = current_price * (1 + take_profit_percent / 100) if side == 'buy' else current_price * (
-                    1 - take_profit_percent / 100)
+            take_profit_price = target_price
 
             # Логирование перед установкой стоп-лосса и тейк-профита
             print(f"Установка стоп-лосса на {stop_loss_price} и тейк-профита на {take_profit_price}")
