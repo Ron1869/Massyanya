@@ -84,6 +84,9 @@ class TradingBot:
         # Получаем комиссии, если они не были переданы
         if commission_rate is None:
             commission_rate = get_trading_fees()  # Получение актуальной комиссии
+            if commission_rate is None:
+                # Если комиссия не была получена, установить значение по умолчанию
+                commission_rate = 0.0004  # По умолчанию используем значение тейкера из .env
 
         # Рассчитать разницу между ценой входа и целью
         if side == 'buy':
@@ -210,7 +213,7 @@ class TradingBot:
             predicted_close_short = predict_next_close(models, df, window_size=10)
             predicted_close_long = predict_next_close(models, df, window_size=60)
             current_price = fetch_current_price(symbol)
-
+            
             # Проверка потенциальной прибыли для краткосрочной сделки
             potential_profit_short = self.calculate_potential_profit(current_price, predicted_close_short, 'buy')
             if potential_profit_short > 0:
@@ -232,12 +235,3 @@ class TradingBot:
     def stop_bot(self):
         """Останавливает выполнение бота."""
         self.bot_running = False
-
-    def fetch_order_history(self, symbol):
-        """Получение истории ордеров для указанного символа."""
-        try:
-            orders = self.exchange.fetch_orders(symbol)
-            return orders
-        except Exception as e:
-            print(f"Ошибка при получении истории ордеров: {e}")
-            return []
