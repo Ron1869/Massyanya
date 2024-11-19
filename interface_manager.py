@@ -92,6 +92,17 @@ class InterfaceManager:
         )
         self.stop_button.grid(row=10, column=1, padx=10, pady=10, sticky="ew")
 
+        def toggle_bot(self):
+            """
+            Запуск или остановка бота.
+            """
+            self.bot_running = not self.bot_running
+            if self.bot_running:
+                self.bot_button.config(text="Остановить Масяню", bg="red")
+            else:
+                self.bot.stop_bot()
+                self.bot_button.config(text="Запустить Масяню", bg="green")
+
         # Кнопка для открытия графика
         self.open_chart_button = tk.Button(
             self.window, text="Открыть график", command=self.open_chart,
