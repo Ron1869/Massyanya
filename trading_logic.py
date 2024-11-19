@@ -18,6 +18,14 @@ class TradingBot:
         self.active_trade = False  # Флаг для проверки активной сделки
         self.exchange = exchange_manager.get_exchange()  # Создаем объект биржи
 
+    def stop_bot(self):
+        """Останавливает работу бота."""
+        if self.bot_running:
+            self.bot_running = False
+            print("Бот остановлен.")
+        else:
+            print("Бот уже остановлен.")
+
     def fetch_binance_data(self, symbol, timeframe='1h', limit=500):
         """Получает исторические данные с Binance с использованием CCXT."""
         try:
@@ -123,10 +131,13 @@ class TradingBot:
             entry_price_int = int(current_price)
 
             # Определение целевой цены в зависимости от типа сделки
+            base_price_int = int(current_price)  # Используем только целую часть текущей цены
+            fractional_part = current_price - base_price_int  # Сохраняем дробную часть
+
             if take_profit_percent >= 80000:
-                target_price = entry_price_int + 8000  # Долгосрочная сделка: добавляем 8000 пунктов
+                target_price = base_price_int + 8000 + fractional_part  # Долгосрочная сделка: добавляем 8000 пунктов
             else:
-                target_price = entry_price_int + 2000  # Краткосрочная сделка: добавляем 2000 пунктов
+                target_price = base_price_int + 2000 + fractional_part  # Краткосрочная сделка: добавляем 2000 пунктов
 
             entry_amount_usdt = max(entry_amount_usdt, 110)
             amount = entry_amount_usdt / current_price
