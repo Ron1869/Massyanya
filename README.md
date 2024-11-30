@@ -1,6 +1,8 @@
 # Massyanya
 Общее описание проекта 'Massyanya':
-![photo_2024-11-17_12-02-10](https://github.com/user-attachments/assets/fde4b00a-c101-4b3c-b424-5155b09ca7c0)
+![photo_2024-11-17_12-02-10](https://github.com/user-atta                                                                                            ![photo_2024-11-30_20-15-53](https://github.com/user-attachments/assets/d416c5c0-b14b-43ae-bc44-6d3cb5828959)
+chments/assets/fde4b00a-c101-4b3c-b424-515                                                                                                           ![photo_2024-11-30_20-16-49](https://github.com/user-attachments/assets/f4a3a8d3-3324-497a-82e1-8d08994d3375)
+5b09ca7c0)
 
 Проект 'Massyanya' представляет собой торгового бота для криптовалют, использующего данные биржи Binance для анализа и прогнозирования цен. Бот сочетает в себе машинное обучение (LSTM и K-Means) и классические методы технического анализа для принятия торговых решений. Основная цель проекта — автоматизация процесса торговли криптовалютами на основе предсказаний цены и анализа данных.
 
